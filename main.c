@@ -4,31 +4,7 @@
 
 #define MAX_PROCESSES 100
 
-//typedef struct PCBNode {
-//    struct PCBNode* next; // Pointer to the next child node
-//} PCBNode;
 
-//typedef struct PCB_V1 {
-//    int parent;
-//    int index;
-//    struct PCV_V1* nextChild;
-//
-//} PCB_V1;
-//
-//void create(PCB_V1* p){
-//    PCB_V1* pcb_q = (PCB_V1*) malloc(sizeof (PCB_V1));
-//    pcb_q->parent = p->index;
-//    pcb_q->nextChild = NULL;
-//
-//    if(p->nextChild==NULL){
-//        p->nextChild = pcb_q;
-//    }else{
-//        while(p.)
-//    }
-//
-//
-//
-//}
 
 int v1Index = 0;
 
@@ -67,15 +43,7 @@ PCB_V1* create(PCB_V1* p) {
         printf("if\n");
     } else {
         printf("else\n");
-//        PCB_V1* current = p->nextChild->child;
-//
-//        while (current->nextChild->child != NULL) {
-//            printf("%d is not null",current->nextChild->child->index);
-//            current = current->nextChild->child;
-//        }
-//
-//        current->nextChild->child = pcb_q;
-//
+
         childPointer* current = p->nextChild;
         while (current->next != NULL) {
             current = current->next;
@@ -92,82 +60,7 @@ PCB_V1* create(PCB_V1* p) {
     return pcb_q;
 
 }
-//
-//void destroy(PCB_V1 * p) {
-//
-//    if(p->nextChild==NULL){
-//        free(p);
-//    }else {
-//        childPointer* next = p->nextChild;
-//        while (next != NULL) {
-//
-//            free(next->child);
-//
-//            if (next->next!=NULL){
-//                next= next->next;
-//            }
-//
-//        }
-//
-//    }
 
-
-//not working 2
-//void destroy(PCB_V1* p) {
-//    // First, destroy all children of this process
-//    childPointer* current = p->nextChild;
-//    while (current != NULL) {
-//        childPointer* temp = current->next; // Save the next pointer
-//        destroy(current->child); // Recursively destroy the child
-//        free(current); // Free the childPointer structure
-//        current = temp; // Move to the next child
-//    }
-//
-//    // After all children are destroyed, destroy this process
-//    printf("\nProcess %d destroyed\n", p->index);
-//    free(p);
-//}
-//
-//
-
-//my code not working 2/1 12:27
-//void destroy(PCB_V1* p) {
-//
-//
-//    if (p->nextChild == NULL) {
-//        printf("\nProcess %d destroying\n", p->index);
-//
-//        if(p->parent!=NULL){
-//            childPointer* ParentCP = p->parent->nextChild;
-//            childPointer* Previous;
-//            while(ParentCP->cID!=p->index){
-//                Previous = ParentCP;
-//                ParentCP= ParentCP->next;
-//            }
-//
-//            Previous->next=ParentCP->next;
-//            free(ParentCP);
-//        }
-//        free(p);
-//
-//
-//
-//        return;
-//    }
-//    childPointer *cp = p->nextChild;
-//    while (cp->next != NULL || cp->child != NULL) {
-//
-//        if (cp->child != NULL) {
-//            destroy(cp->child);
-//        }
-//        if (cp->next != NULL) {
-//            cp = cp->next;
-//
-//        }
-//
-//
-//    }
-//}
 
 //working 2/1 1:00
 void destroy(PCB_V1* p) {
@@ -209,50 +102,6 @@ void destroy(PCB_V1* p) {
 }
 
 
-/*
-//working but wont destroy a childs second child
-void destroy(PCB_V1* p) {
-    if (p == NULL) {
-        printf("Attempted to destroy a null PCB.\n");
-        return;
-    }
-
-    printf("Destroying PCB %d\n", p->index);
-
-    childPointer* current = p->nextChild;
-    while (current != NULL) {
-        childPointer* next = current->next;
-        printf("Destroying child of PCB %d\n", p->index);
-        destroy(current->child);
-        free(current);
-        current = next;
-    }
-
-    printf("Freeing PCB %d\n", p->index);
-    free(p);
-}
-*/
-
-
-//    while (p->nextChild != NULL) {
-//        childPointer* currentChild = p->nextChild;
-//        childPointer* next;
-//        while(currentChild != NULL){
-//            next=currentChild->next;
-//            destroy(next)
-//        }
-//
-//        p->nextChild = currentChild->nextChild;
-//        printf("\nProcess %d Destroyed\n", currentChild->index);
-//        destroy(currentChild); // Recursively destroy the child
-//
-//    }
-//    printf("\nProcess %d destroyed\n", p->index);
-//    free(p);
-
-
-//}
-
 
 
 // Test program for Version 1
@@ -269,18 +118,14 @@ void testProgramV1() {
     PCB_V1* pcb4 = create(pcb2);
     PCB_V1* pcb5 = create(pcb2);
 
-   // printf("\npcb1 son: %d\n", pcb1.nextChild->child->index);
 
-    printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
+
+    //printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
     destroy(pcb0);
 
     //printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
 
 }
-
-
-
-
 
 
 
@@ -298,12 +143,7 @@ double measureExecutionTime(void (*testProgram)()) {
 }
 
 int main() {
-    // Initialize PCB arrays for both versions
-    // ...
-
 testProgramV1();
-
-
     return 0;
 }
 //
