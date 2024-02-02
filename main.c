@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include "stack.h"
 #define MAX_PROCESSES 100
 
 
 
-int v1Index = 0;
+int v1PID = 0;
+int v2PID = 0;
 
 
 typedef struct PCB_V1 PCB_V1;
@@ -24,6 +25,14 @@ typedef struct PCB_V1 {
     struct childPointer* nextChild;
 } PCB_V1;
 
+typedef struct PCB_V2 {
+    struct PCB_V2* parent;
+    int index;
+    struct childPointer* nextChild;
+} PCB_V2;
+
+
+
 PCB_V1* create(PCB_V1* p) {
     PCB_V1* pcb_q = (PCB_V1*)malloc(sizeof(PCB_V1));
 
@@ -31,14 +40,14 @@ PCB_V1* create(PCB_V1* p) {
 
 
     pcb_q->parent = p;
-    pcb_q->index = ++v1Index;
+    pcb_q->index = ++v1PID;
     pcb_q->nextChild = NULL;
 
     if (p->nextChild == NULL) {
         childPointer* cp = (childPointer*)malloc(sizeof(childPointer));
         cp->child = pcb_q;
         cp->next = NULL;
-        cp->cID =v1Index;
+        cp->cID =v1PID;
         p->nextChild = cp;
         printf("if\n");
     } else {
@@ -62,8 +71,8 @@ PCB_V1* create(PCB_V1* p) {
 }
 
 
-//working 2/1 1:00
-void destroy(PCB_V1* p) {
+//working 2/1 1:00 (no array)
+void destroyV1(PCB_V1* p) {
     if (p == NULL) {
         printf("Attempted to destroy a null PCB.\n");
         return;
@@ -73,7 +82,7 @@ void destroy(PCB_V1* p) {
     while (p->nextChild != NULL) {
         childPointer* cp = p->nextChild;
         p->nextChild = cp->next;
-        destroy(cp->child); // Recursively destroy the child
+        destroyV1(cp->child); // Recursively destroy the child
         free(cp); // Free the childPointer structure
     }
 
@@ -108,7 +117,7 @@ void destroy(PCB_V1* p) {
 void testProgramV1() {
     printf("\nProcess ");
     PCB_V1* pcb0 = (PCB_V1*)malloc(sizeof(PCB_V1));
-    pcb0->index=v1Index;
+    pcb0->index=v1PID;
     pcb0->parent=NULL;
     pcb0->nextChild=NULL;
 
@@ -121,11 +130,17 @@ void testProgramV1() {
 
 
     //printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
-    destroy(pcb0);
+    destroyV1(pcb0);
 
     //printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
 
 }
+
+
+
+
+
+
 
 
 
@@ -143,9 +158,23 @@ double measureExecutionTime(void (*testProgram)()) {
 }
 
 int main() {
-testProgramV1();
+    //testProgramV1();
+    Stack stack;
+    initializeStack(&stack, 5);
+
+    fill(&stack,MAX_PROCESSES);
+
+    printf("Top element is %d\n", top(&stack));
+    pop(&stack);
+    printf("Top element is now %d\n", top(&stack));
+
+    destroyStack(&stack);
+
     return 0;
 }
+
+
+
 //
 //int main() {
 //    // Initialize PCB arrays for both versions
