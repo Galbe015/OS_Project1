@@ -47,6 +47,8 @@ int top(Stack *stack) {
 // Function to check if the stack is empty
 int isEmpty(Stack *stack) {
     return stack->top == -1;
+
+
 }
 
 // Function to free stack memory

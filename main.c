@@ -6,11 +6,16 @@
 
 
 
-int v1PID = 0;
-int v2PID = 0;
+
 
 
 typedef struct PCB_V1 PCB_V1;
+typedef struct PCB_V2 PCB_V2;
+
+
+int v1PID = 0;
+
+
 
 typedef struct childPointer {
     struct childPointer* next;
@@ -25,11 +30,146 @@ typedef struct PCB_V1 {
     struct childPointer* nextChild;
 } PCB_V1;
 
+
 typedef struct PCB_V2 {
-    struct PCB_V2* parent;
+    int parent;
+    int first_child;
+    int younger_sibling;
+    int older_sibling;
     int index;
-    struct childPointer* nextChild;
 } PCB_V2;
+
+
+PCB_V2 pcbArrayV2[MAX_PROCESSES];
+Stack freeIndexStackV2;
+
+
+void createV2(PCB_V2* p) {
+
+    int newIndex = top(&freeIndexStackV2);
+
+    pop(&freeIndexStackV2);
+
+    //pcbArrayV2[newIndex] = *(PCB_V2*)malloc(sizeof(PCB_V2));
+    pcbArrayV2[newIndex].first_child=-1;
+    pcbArrayV2[newIndex].younger_sibling=-1;
+    pcbArrayV2[newIndex].index=newIndex;
+
+    pcbArrayV2[newIndex].parent=p->index;
+
+    if(p->first_child==-1){
+        pcbArrayV2[newIndex].older_sibling=-1;
+        p->first_child= pcbArrayV2[newIndex].index;
+        printf("\nCreating p %d he has no siblings\n",newIndex);
+    }else{
+
+        int youngestChild = p->first_child;
+
+        printf("\nCreating p %d he siblings including: %d,",newIndex,youngestChild);
+
+        while(pcbArrayV2[youngestChild].younger_sibling != -1){
+            youngestChild = pcbArrayV2[youngestChild].younger_sibling;
+            printf("p %d,",youngestChild);
+
+        }
+        pcbArrayV2[newIndex].older_sibling=youngestChild;
+        pcbArrayV2[youngestChild].younger_sibling=newIndex;
+
+    }
+
+}
+
+
+void destroyV2(PCB_V2* p) {
+
+
+
+//    int nextChild = p->first_child;
+//    while(nextChild != -1){
+//        printf("\nhe had child %d destroying him how\n",nextChild);
+//        destroyV2(&pcbArrayV2[nextChild]);
+//        nextChild = pcbArrayV2[nextChild].younger_sibling;
+//    }
+
+/*
+ * working but ineficent
+    int childIndices[MAX_PROCESSES];
+    int childCount = 0;
+    int childIndex = p->first_child;
+    while (childIndex != -1 && childCount < MAX_PROCESSES) {
+        childIndices[childCount++] = childIndex;
+        childIndex = pcbArrayV2[childIndex].younger_sibling;
+    }
+
+    // Destroy child PCBs using the collected indices
+    for (int i = 0; i < childCount; i++) {
+        destroyV2(&pcbArrayV2[childIndices[i]]);
+    }
+*/
+
+    printf("\ndestroying p %d \n",p->index);
+
+Stack children;
+
+    initializeStack(&children,MAX_PROCESSES);
+
+
+    int nextChild = p->first_child;
+    while(nextChild != -1){
+        printf("\nhe had child %d destroying him how\n",nextChild);
+        //destroyV2(&pcbArrayV2[nextChild]);
+        push(&children,nextChild);
+        nextChild = pcbArrayV2[nextChild].younger_sibling;
+    }
+
+    while(!isEmpty(&children)){
+        destroyV2(&pcbArrayV2[pop(&children)]);
+    }
+
+
+
+    if(p->older_sibling!=-1){//destroy connection between  siblings
+        if(p->younger_sibling!=-1){
+            pcbArrayV2[p->older_sibling].younger_sibling=p->younger_sibling;
+            pcbArrayV2[p->younger_sibling].older_sibling=p->older_sibling;
+
+
+        }else{
+            pcbArrayV2[p->older_sibling].younger_sibling=-1;
+        }
+    }else{//if he does not have an older sibling but has a younger sibling
+        if(p->younger_sibling!=-1){
+            pcbArrayV2[p->younger_sibling].older_sibling=-1;
+            pcbArrayV2[p->parent].first_child=p->younger_sibling;
+
+        }else{
+            pcbArrayV2[p->parent].first_child=-1;
+
+        }
+    }
+
+
+
+    pcbArrayV2[p->index].parent = -1;
+    pcbArrayV2[p->index].first_child = -1;
+    pcbArrayV2[p->index].younger_sibling = -1;
+    pcbArrayV2[p->index].older_sibling = -1;
+
+    destroyStack(&children);
+    push(&freeIndexStackV2,p->index);
+
+    pcbArrayV2[p->index].index = -1;
+   // free(p);
+
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -140,13 +280,30 @@ void testProgramV1() {
 
 
 
-
-
-
-
 // Test program for Version 2
 void testProgramV2() {
     // Implement test program for Version 2
+
+   // pcbArrayV2[top(&freeIndexStackV2)] = *(PCB_V2*)malloc(sizeof(PCB_V2));
+    pcbArrayV2[top(&freeIndexStackV2)].first_child=-1;
+    pcbArrayV2[top(&freeIndexStackV2)].parent=-1;
+    pcbArrayV2[top(&freeIndexStackV2)].younger_sibling=-1;
+    pcbArrayV2[top(&freeIndexStackV2)].older_sibling=-1;
+    pop(&freeIndexStackV2);
+
+
+    createV2(&pcbArrayV2[0]);
+    createV2(&pcbArrayV2[0]);
+    createV2(&pcbArrayV2[0]);
+
+
+    printf("\nindex of root: %d\n", pcbArrayV2[0].index);
+    printf("\n2nd Child: %d\n",pcbArrayV2[pcbArrayV2[0].first_child].younger_sibling);
+    printf("\n2nd Child: %d\n",pcbArrayV2[19].index<= 0);
+    destroyV2(&pcbArrayV2[0]);
+    //printf("\n2nd Child: %d\n",pcbArrayV2[-1].younger_sibling);
+
+
 }
 
 // Function to measure the execution time of a test program
@@ -159,16 +316,15 @@ double measureExecutionTime(void (*testProgram)()) {
 
 int main() {
     //testProgramV1();
-    Stack stack;
-    initializeStack(&stack, 5);
+    initializeStack(&freeIndexStackV2, MAX_PROCESSES);
+    fill(&freeIndexStackV2,MAX_PROCESSES);
 
-    fill(&stack,MAX_PROCESSES);
 
-    printf("Top element is %d\n", top(&stack));
-    pop(&stack);
-    printf("Top element is now %d\n", top(&stack));
+    testProgramV2();
 
-    destroyStack(&stack);
+    printf("\n\nTop element is %d\n", top(&freeIndexStackV2));
+
+    destroyStack(&freeIndexStackV2);
 
     return 0;
 }
