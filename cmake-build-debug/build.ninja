@@ -49,8 +49,8 @@ cmake_ninja_workdir = C$:/Users/Gabri/Desktop/Operating$ Systems$ M.S/OS$ Compar
 
 build cmake_object_order_depends_target_Programs: phony || CMakeFiles/Programs.dir
 
-build CMakeFiles/Programs.dir/main2.c.obj: C_COMPILER__Programs_unscanned_Debug C$:/Users/Gabri/Desktop/Operating$ Systems$ M.S/OS$ Comparative$ anayalis/Program1/main2.c || cmake_object_order_depends_target_Programs
-  DEP_FILE = CMakeFiles\Programs.dir\main2.c.obj.d
+build CMakeFiles/Programs.dir/main.c.obj: C_COMPILER__Programs_unscanned_Debug C$:/Users/Gabri/Desktop/Operating$ Systems$ M.S/OS$ Comparative$ anayalis/Program1/main.c || cmake_object_order_depends_target_Programs
+  DEP_FILE = CMakeFiles\Programs.dir\main.c.obj.d
   FLAGS = -g -std=gnu11 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Programs.dir
   OBJECT_FILE_DIR = CMakeFiles\Programs.dir
@@ -69,7 +69,7 @@ build CMakeFiles/Programs.dir/stack.c.obj: C_COMPILER__Programs_unscanned_Debug 
 #############################################
 # Link the executable Programs.exe
 
-build Programs.exe: C_EXECUTABLE_LINKER__Programs_Debug CMakeFiles/Programs.dir/main2.c.obj CMakeFiles/Programs.dir/stack.c.obj
+build Programs.exe: C_EXECUTABLE_LINKER__Programs_Debug CMakeFiles/Programs.dir/main.c.obj CMakeFiles/Programs.dir/stack.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Programs.dir

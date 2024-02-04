@@ -3,6 +3,6 @@ project(Programs C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(Programs main2.c
+add_executable(Programs main.c
         stack.h
         stack.c)

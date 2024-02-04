@@ -5,17 +5,11 @@
 #define MAX_PROCESSES 100
 
 
-
-
-
-
 typedef struct PCB_V1 PCB_V1;
 typedef struct PCB_V2 PCB_V2;
 
 
 int v1PID = 0;
-
-
 
 typedef struct childPointer {
     struct childPointer* next;
@@ -60,16 +54,14 @@ void createV2(PCB_V2* p) {
     if(p->first_child==-1){
         pcbArrayV2[newIndex].older_sibling=-1;
         p->first_child= pcbArrayV2[newIndex].index;
-        printf("\nCreating p %d he has no siblings\n",newIndex);
+
     }else{
 
         int youngestChild = p->first_child;
 
-        printf("\nCreating p %d he siblings including: %d,",newIndex,youngestChild);
 
         while(pcbArrayV2[youngestChild].younger_sibling != -1){
             youngestChild = pcbArrayV2[youngestChild].younger_sibling;
-            printf("p %d,",youngestChild);
 
         }
         pcbArrayV2[newIndex].older_sibling=youngestChild;
@@ -82,42 +74,13 @@ void createV2(PCB_V2* p) {
 
 void destroyV2(PCB_V2* p) {
 
-
-
-//    int nextChild = p->first_child;
-//    while(nextChild != -1){
-//        printf("\nhe had child %d destroying him how\n",nextChild);
-//        destroyV2(&pcbArrayV2[nextChild]);
-//        nextChild = pcbArrayV2[nextChild].younger_sibling;
-//    }
-
-/*
- * working but ineficent
-    int childIndices[MAX_PROCESSES];
-    int childCount = 0;
-    int childIndex = p->first_child;
-    while (childIndex != -1 && childCount < MAX_PROCESSES) {
-        childIndices[childCount++] = childIndex;
-        childIndex = pcbArrayV2[childIndex].younger_sibling;
-    }
-
-    // Destroy child PCBs using the collected indices
-    for (int i = 0; i < childCount; i++) {
-        destroyV2(&pcbArrayV2[childIndices[i]]);
-    }
-*/
-
-    printf("\ndestroying p %d \n",p->index);
-
-Stack children;
+    Stack children;
 
     initializeStack(&children,MAX_PROCESSES);
 
-
     int nextChild = p->first_child;
     while(nextChild != -1){
-        printf("\nhe had child %d destroying him how\n",nextChild);
-        //destroyV2(&pcbArrayV2[nextChild]);
+
         push(&children,nextChild);
         nextChild = pcbArrayV2[nextChild].younger_sibling;
     }
@@ -125,8 +88,6 @@ Stack children;
     while(!isEmpty(&children)){
         destroyV2(&pcbArrayV2[pop(&children)]);
     }
-
-
 
     if(p->older_sibling!=-1){//destroy connection between  siblings
         if(p->younger_sibling!=-1){
@@ -148,8 +109,6 @@ Stack children;
         }
     }
 
-
-
     pcbArrayV2[p->index].parent = -1;
     pcbArrayV2[p->index].first_child = -1;
     pcbArrayV2[p->index].younger_sibling = -1;
@@ -159,25 +118,15 @@ Stack children;
     push(&freeIndexStackV2,p->index);
 
     pcbArrayV2[p->index].index = -1;
-   // free(p);
+
 
 }
 
 
 
 
-
-
-
-
-
-
-
 PCB_V1* create(PCB_V1* p) {
     PCB_V1* pcb_q = (PCB_V1*)malloc(sizeof(PCB_V1));
-
-
-
 
     pcb_q->parent = p;
     pcb_q->index = ++v1PID;
@@ -189,9 +138,7 @@ PCB_V1* create(PCB_V1* p) {
         cp->next = NULL;
         cp->cID =v1PID;
         p->nextChild = cp;
-        printf("if\n");
     } else {
-        printf("else\n");
 
         childPointer* current = p->nextChild;
         while (current->next != NULL) {
@@ -205,7 +152,6 @@ PCB_V1* create(PCB_V1* p) {
 
     }
 
-    printf("\nProcess %d Created\n", pcb_q->index);
     return pcb_q;
 
 }
@@ -214,7 +160,6 @@ PCB_V1* create(PCB_V1* p) {
 //working 2/1 1:00 (no array)
 void destroyV1(PCB_V1* p) {
     if (p == NULL) {
-        printf("Attempted to destroy a null PCB.\n");
         return;
     }
 
@@ -246,7 +191,6 @@ void destroyV1(PCB_V1* p) {
         }
     }
 
-    printf("Freeing PCB %d\n", p->index);
     free(p);
 }
 
@@ -255,28 +199,38 @@ void destroyV1(PCB_V1* p) {
 
 // Test program for Version 1
 void testProgramV1() {
-    printf("\nProcess ");
-    PCB_V1* pcb0 = (PCB_V1*)malloc(sizeof(PCB_V1));
-    pcb0->index=v1PID;
-    pcb0->parent=NULL;
-    pcb0->nextChild=NULL;
 
-    PCB_V1* pcb1 = create(pcb0);
-    PCB_V1* pcb2 = create(pcb0);
-    PCB_V1* pcb3 = create(pcb0);
-    PCB_V1* pcb4 = create(pcb2);
-    PCB_V1* pcb5 = create(pcb2);
+    int iterations = 20;
+//run multiple times to get an average time
+    for(int i = 0; i<iterations;i++) {
+        //create root
+        PCB_V1 *pcb0 = (PCB_V1 *) malloc(sizeof(PCB_V1));
+        pcb0->index = v1PID;
+        pcb0->parent = NULL;
+        pcb0->nextChild = NULL;
+
+        PCB_V1 *pcb1 = create(pcb0);
+        PCB_V1 *pcb2 = create(pcb0);
+        PCB_V1 *pcb3 = create(pcb0);
+        PCB_V1 *pcb4 = create(pcb2);
+        PCB_V1 *pcb5 = create(pcb2);
 
 
-
-    //printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
-    destroyV1(pcb0);
-
-    //printf("\npcb2 son: %d\n", pcb2->nextChild->next->child->index);
+        destroyV1(pcb0);
+    }
 
 }
 
 
+void resetPCBArrayV2() {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        pcbArrayV2[i].parent = -1;
+        pcbArrayV2[i].first_child = -1;
+        pcbArrayV2[i].younger_sibling = -1;
+        pcbArrayV2[i].older_sibling = -1;
+        pcbArrayV2[i].index = -1;
+    }
+}
 
 
 
@@ -284,25 +238,32 @@ void testProgramV1() {
 void testProgramV2() {
     // Implement test program for Version 2
 
-   // pcbArrayV2[top(&freeIndexStackV2)] = *(PCB_V2*)malloc(sizeof(PCB_V2));
-    pcbArrayV2[top(&freeIndexStackV2)].first_child=-1;
-    pcbArrayV2[top(&freeIndexStackV2)].parent=-1;
-    pcbArrayV2[top(&freeIndexStackV2)].younger_sibling=-1;
-    pcbArrayV2[top(&freeIndexStackV2)].older_sibling=-1;
-    pop(&freeIndexStackV2);
 
+    int iterations = 20;
+//run multiple times to get an average time
+    for(int i = 0; i<iterations;i++) {
+        // create root
+        pcbArrayV2[top(&freeIndexStackV2)].first_child = -1;
+        pcbArrayV2[top(&freeIndexStackV2)].parent = -1;
+        pcbArrayV2[top(&freeIndexStackV2)].younger_sibling = -1;
+        pcbArrayV2[top(&freeIndexStackV2)].older_sibling = -1;
+        pop(&freeIndexStackV2);
 
-    createV2(&pcbArrayV2[0]);
-    createV2(&pcbArrayV2[0]);
-    createV2(&pcbArrayV2[0]);
+        //create pcb structure as per class instructions
+        createV2(&pcbArrayV2[0]);
+        createV2(&pcbArrayV2[0]);
+        createV2(&pcbArrayV2[0]);
+        createV2(&pcbArrayV2[2]);
+        createV2(&pcbArrayV2[2]);
 
+        destroyV2(&pcbArrayV2[0]);
 
-
-    destroyV2(&pcbArrayV2[0]);
-
-
+        destroyStack(&freeIndexStackV2);
+        resetPCBArrayV2();
+    }
 
 }
+
 
 // Function to measure the execution time of a test program
 double measureExecutionTime(void (*testProgram)()) {
@@ -314,42 +275,49 @@ double measureExecutionTime(void (*testProgram)()) {
 
 int main() {
     //testProgramV1();
+
+    // Initialize resources for Version 2
     initializeStack(&freeIndexStackV2, MAX_PROCESSES);
-    fill(&freeIndexStackV2,MAX_PROCESSES);
+    fill(&freeIndexStackV2, MAX_PROCESSES);
+
+    // Define the number of iterations for the test
+    int iterations = 100000; // Adjust this number as needed
+    double totalTimeV1 = 0.0, totalTimeV2 = 0.0;
+
+    // Loop to run tests and measure time for both versions
+    for (int i = 0; i < iterations; i++) {
+        totalTimeV1 += measureExecutionTime(testProgramV1);
+        totalTimeV2 += measureExecutionTime(testProgramV2);
+    }
+
+//testProgramV2();
+//testProgramV1();
+
+    // Calculate average time for each version
+    double avgTimeV1 = totalTimeV1 / iterations;
+    double avgTimeV2 = totalTimeV2 / iterations;
+
+    // Output the results
+    printf("Average time for Version 1: %f seconds\n", avgTimeV1);
+    printf("Average time for Version 2: %f seconds\n", avgTimeV2);
 
 
-    testProgramV2();
+
+    // Determine which version is faster and by what percentage
+    double percentFaster;
+    if (avgTimeV1 < avgTimeV2) {
+        percentFaster = (avgTimeV2 - avgTimeV1) / avgTimeV2 * 100.0;
+        printf("Version 1 is %.2f%% faster on average compared to Version 2.\n", percentFaster);
+    } else if (avgTimeV2 < avgTimeV1) {
+        percentFaster = (avgTimeV1 - avgTimeV2) / avgTimeV1 * 100.0;
+        printf("Version 2 is %.2f%% faster on average compared to Version 1.\n", percentFaster);
+    } else {
+        printf("Both versions have the same average execution time.\n");
+    }
 
 
-
+    // Clean up resources
     destroyStack(&freeIndexStackV2);
 
     return 0;
 }
-
-
-
-//
-//int main() {
-//    // Initialize PCB arrays for both versions
-//    // ...
-//
-//    // Repeat the test program in a long loop and measure the execution time
-//    int numIterations = 100000; // Adjust the number of iterations as needed
-//    double timeVersion1 = 0.0;
-//    double timeVersion2 = 0.0;
-//
-//    for (int i = 0; i < numIterations; ++i) {
-//        // Version 1
-//        timeVersion1 += measureExecutionTime(testProgramV1);
-//
-//        // Version 2
-//        timeVersion2 += measureExecutionTime(testProgramV2);
-//    }
-//
-//    // Display the average execution time for each version
-//    printf("Average execution time for Version 1: %.6f seconds\n", timeVersion1 / numIterations);
-//    printf("Average execution time for Version 2: %.6f seconds\n", timeVersion2 / numIterations);
-//
-//    return 0;
-//}
