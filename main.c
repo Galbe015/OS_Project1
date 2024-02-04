@@ -297,11 +297,9 @@ void testProgramV2() {
     createV2(&pcbArrayV2[0]);
 
 
-    printf("\nindex of root: %d\n", pcbArrayV2[0].index);
-    printf("\n2nd Child: %d\n",pcbArrayV2[pcbArrayV2[0].first_child].younger_sibling);
-    printf("\n2nd Child: %d\n",pcbArrayV2[19].index<= 0);
+
     destroyV2(&pcbArrayV2[0]);
-    //printf("\n2nd Child: %d\n",pcbArrayV2[-1].younger_sibling);
+
 
 
 }
@@ -322,7 +320,7 @@ int main() {
 
     testProgramV2();
 
-    printf("\n\nTop element is %d\n", top(&freeIndexStackV2));
+
 
     destroyStack(&freeIndexStackV2);
 

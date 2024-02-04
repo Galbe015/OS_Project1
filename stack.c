@@ -29,7 +29,7 @@ void push(Stack *stack, int item) {
 // Function to remove an item from stack
 int pop(Stack *stack) {
     if (stack->top == -1) {
-        printf("Stack Underflow\n");
+        //printf("Stack Underflow\n");
         return -1; // Indicate error
     }
     return stack->array[stack->top--];
@@ -38,7 +38,7 @@ int pop(Stack *stack) {
 // Function to get the top item of stack
 int top(Stack *stack) {
     if (stack->top == -1) {
-        printf("Stack is Empty\n");
+        //printf("Stack is Empty\n");
         return -1; // Indicate error
     }
     return stack->array[stack->top];
