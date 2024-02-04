@@ -7,7 +7,7 @@
 
 typedef struct PCB_V1 PCB_V1;
 typedef struct PCB_V2 PCB_V2;
-
+const int maxChildren = 20;
 
 int v1PID = 0;
 
@@ -123,8 +123,6 @@ void destroyV2(PCB_V2* p) {
 }
 
 
-
-
 PCB_V1* create(PCB_V1* p) {
     PCB_V1* pcb_q = (PCB_V1*)malloc(sizeof(PCB_V1));
 
@@ -157,7 +155,6 @@ PCB_V1* create(PCB_V1* p) {
 }
 
 
-//working 2/1 1:00 (no array)
 void destroyV1(PCB_V1* p) {
     if (p == NULL) {
         return;
@@ -195,30 +192,46 @@ void destroyV1(PCB_V1* p) {
 }
 
 
-
-
-// Test program for Version 1
 void testProgramV1() {
+    srand((unsigned)time(NULL)); // Seed the random number generator
 
-    int iterations = 20;
-//run multiple times to get an average time
-    for(int i = 0; i<iterations;i++) {
-        //create root
-        PCB_V1 *pcb0 = (PCB_V1 *) malloc(sizeof(PCB_V1));
-        pcb0->index = v1PID;
-        pcb0->parent = NULL;
-        pcb0->nextChild = NULL;
-
-        PCB_V1 *pcb1 = create(pcb0);
-        PCB_V1 *pcb2 = create(pcb0);
-        PCB_V1 *pcb3 = create(pcb0);
-        PCB_V1 *pcb4 = create(pcb2);
-        PCB_V1 *pcb5 = create(pcb2);
+    // Define a maximum number of children a process can have
 
 
-        destroyV1(pcb0);
+    // Repeat the test program in a loop
+    for (int i = 0; i < 20; i++) {
+        // Create root process
+        PCB_V1* root = (PCB_V1*)malloc(sizeof(PCB_V1));
+        root->index = v1PID;
+        root->parent = NULL;
+        root->nextChild = NULL;
+
+        // Randomly decide how many children the root will have
+        int numChildren = rand() % (maxChildren + 1); // Generates a number between 0 and maxChildren
+
+        // Create children
+        for (int j = 0; j < numChildren; j++) {
+            create(root);
+        }
+
+        // Randomly destroy processes
+        while (root->nextChild != NULL) {
+            int destroyIndex = rand() % numChildren;
+            childPointer* cp = root->nextChild;
+            for (int k = 0; k < destroyIndex; k++) {
+                if (cp->next == NULL) {
+                    break;
+                }
+                cp = cp->next;
+            }
+            if (cp->child != NULL) {
+                destroyV1(cp->child);
+            }
+        }
+
+        // Destroy the root process last
+        destroyV1(root);
     }
-
 }
 
 
@@ -233,35 +246,43 @@ void resetPCBArrayV2() {
 }
 
 
-
-// Test program for Version 2
 void testProgramV2() {
-    // Implement test program for Version 2
+    srand((unsigned)time(NULL)); // Seed the random number generator
 
+    // Repeat the test program in a loop
+    for (int i = 0; i < 20; i++) {
+        // Reset PCB Array and Stack for each iteration
+        resetPCBArrayV2();
+        fill(&freeIndexStackV2, MAX_PROCESSES);
 
-    int iterations = 20;
-//run multiple times to get an average time
-    for(int i = 0; i<iterations;i++) {
-        // create root
+        // Create root process
         pcbArrayV2[top(&freeIndexStackV2)].first_child = -1;
         pcbArrayV2[top(&freeIndexStackV2)].parent = -1;
         pcbArrayV2[top(&freeIndexStackV2)].younger_sibling = -1;
         pcbArrayV2[top(&freeIndexStackV2)].older_sibling = -1;
+        pcbArrayV2[top(&freeIndexStackV2)].index = top(&freeIndexStackV2);
         pop(&freeIndexStackV2);
 
-        //create pcb structure as per class instructions
-        createV2(&pcbArrayV2[0]);
-        createV2(&pcbArrayV2[0]);
-        createV2(&pcbArrayV2[0]);
-        createV2(&pcbArrayV2[2]);
-        createV2(&pcbArrayV2[2]);
+        // Randomly decide how many children the root will have and create them
+        int numChildren = rand() % (maxChildren + 1);
+        for (int j = 0; j < numChildren; j++) {
+            createV2(&pcbArrayV2[0]);
+        }
 
+        // Randomly destroy some processes
+        for (int j = 0; j < numChildren; j++) {
+            int childIndex = rand() % MAX_PROCESSES;
+            if (pcbArrayV2[childIndex].index != -1) { // Check if the process exists
+                destroyV2(&pcbArrayV2[childIndex]);
+            }
+        }
+
+        // Destroy the root process last
         destroyV2(&pcbArrayV2[0]);
 
-        destroyStack(&freeIndexStackV2);
-        resetPCBArrayV2();
-    }
+        // Reset the PCB Array for the next iteration
 
+    }
 }
 
 
@@ -290,8 +311,6 @@ int main() {
         totalTimeV2 += measureExecutionTime(testProgramV2);
     }
 
-//testProgramV2();
-//testProgramV1();
 
     // Calculate average time for each version
     double avgTimeV1 = totalTimeV1 / iterations;
