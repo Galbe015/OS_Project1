@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.27)
+ cmake_minimum_required(VERSION 3.27)
 project(Programs C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(Programs main.c
+add_executable(Programs main2.c
         stack.h
         stack.c)
